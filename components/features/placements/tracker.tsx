@@ -135,6 +135,7 @@ function AddApplicationModal({ isOpen, onClose, appToEdit }: { isOpen: boolean, 
         e.preventDefault()
 
         if (appToEdit?.id) {
+            // Explicit cast to fix Vercel build error
             await db.applications.update(appToEdit.id, formData as any)
         } else {
             await db.applications.add(formData as any)
