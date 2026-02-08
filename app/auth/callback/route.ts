@@ -8,6 +8,15 @@ export async function GET(request: Request) {
     const code = searchParams.get('code')
     const next = searchParams.get('next') ?? '/dashboard'
 
+    // Check for errors returned directly from the provider (e.g. access_denied)
+    const errorParam = searchParams.get('error')
+    const errorDesc = searchParams.get('error_description')
+
+    if (errorParam) {
+        console.error('Upstream Auth Error:', errorParam, errorDesc)
+        return NextResponse.redirect(`${origin}/auth/auth-code-error?error=${encodeURIComponent(errorParam)}&details=${encodeURIComponent(errorDesc || '')}`)
+    }
+
     if (code) {
         const cookieStore = await cookies()
         const supabase = createServerClient(
@@ -42,5 +51,5 @@ export async function GET(request: Request) {
     }
 
     // Return the user to an error page with instructions
-    return NextResponse.redirect(`${origin}/auth/auth-code-error?error=no_code`)
+    return NextResponse.redirect(`${origin}/auth/auth-code-error?error=no_code_received`)
 }
