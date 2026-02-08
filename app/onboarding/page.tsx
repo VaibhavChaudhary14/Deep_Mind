@@ -4,6 +4,7 @@ import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ArrowRight, Check, User, Code2, Briefcase, Target, ShieldCheck } from "lucide-react"
 import { db } from "@/lib/db"
+import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/components/providers/auth-provider"
@@ -31,30 +32,56 @@ export default function OnboardingPage() {
     })
 
     const handleSubmit = async () => {
-        // Save to DB
-        const existingSettings = await db.settings.orderBy('id').first()
-        if (existingSettings) {
-            await db.settings.update(existingSettings.id!, {
-                username: formData.username,
-                role: formData.role,
-                level: formData.level, // We'll map this string to a simpler level in DB if strictly typed, but let's assume loose for now or DB update
-                execution_score: 0,
-                streak: 0
-            })
-        } else {
-            await db.settings.add({
-                username: formData.username,
-                role: formData.role,
-                level: formData.level,
-                theme: 'light',
-                streak: 0,
-                execution_score: 0,
-                deep_work_mode: false
-            })
-        }
+        try {
+            // 1. Save to Local DB (Dexie)
+            const existingSettings = await db.settings.orderBy('id').first()
+            if (existingSettings) {
+                await db.settings.update(existingSettings.id!, {
+                    username: formData.username,
+                    role: formData.role,
+                    level: formData.level,
+                    execution_score: 0,
+                    streak: 0
+                })
+            } else {
+                await db.settings.add({
+                    username: formData.username,
+                    role: formData.role,
+                    level: formData.level,
+                    theme: 'light',
+                    streak: 0,
+                    execution_score: 0,
+                    deep_work_mode: false
+                })
+            }
 
-        // "Login"
-        login()
+            // 2. Sync to Supabase (Critical for Auth Check)
+            const { data: { user } } = await supabase.auth.getUser()
+            if (user) {
+                const { error } = await supabase
+                    .from('profiles')
+                    .update({
+                        username: formData.username,
+                        role: formData.role,
+                        level: formData.level,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', user.id)
+
+                if (error) {
+                    console.error("Failed to sync profile to Supabase:", error)
+                }
+            }
+
+            // 3. Complete Onboarding
+            login() // Sets local auth state
+            router.push('/dashboard') // Force navigation
+
+        } catch (error) {
+            console.error("Onboarding Error:", error)
+            // Fallback redirect
+            router.push('/dashboard')
+        }
     }
 
     const nextStep = () => {
