@@ -90,7 +90,7 @@ function ProjectCard({ project, index, onDelete, onEdit }: { project: Project, i
             <div className="mb-4">
                 <div className={cn(
                     "inline-block px-2 py-0.5 border-2 border-black text-xs font-black uppercase mb-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
-                    project.status === 'Ship' ? "bg-[#00FF94]" : "bg-[#FFD600]"
+                    project.status === 'Done' ? "bg-[#00FF94]" : "bg-[#FFD600]"
                 )}>
                     {project.status}
                 </div>
