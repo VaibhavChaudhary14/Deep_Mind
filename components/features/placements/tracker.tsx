@@ -135,7 +135,7 @@ function AddApplicationModal({ isOpen, onClose, appToEdit }: { isOpen: boolean, 
         e.preventDefault()
 
         if (appToEdit?.id) {
-            await db.applications.update(appToEdit.id, formData)
+            await db.applications.update(appToEdit.id, formData as any)
         } else {
             await db.applications.add(formData as any)
         }
