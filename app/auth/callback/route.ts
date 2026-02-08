@@ -8,13 +8,21 @@ export async function GET(request: Request) {
     const code = searchParams.get('code')
     const next = searchParams.get('next') ?? '/dashboard'
 
-    // Check for errors returned directly from the provider (e.g. access_denied)
+    // Check for errors
     const errorParam = searchParams.get('error')
     const errorDesc = searchParams.get('error_description')
 
+    // DEBUG: Capture everything
+    const debugInfo = {
+        url: request.url,
+        params: Object.fromEntries(searchParams.entries()),
+        headers: Object.fromEntries(request.headers.entries()) // careful with secrets, but standard headers are fine
+    }
+    const debugString = encodeURIComponent(JSON.stringify(debugInfo))
+
     if (errorParam) {
         console.error('Upstream Auth Error:', errorParam, errorDesc)
-        return NextResponse.redirect(`${origin}/auth/auth-code-error?error=${encodeURIComponent(errorParam)}&details=${encodeURIComponent(errorDesc || '')}`)
+        return NextResponse.redirect(`${origin}/auth/auth-code-error?error=${encodeURIComponent(errorParam)}&details=${encodeURIComponent(errorDesc || '')}&debug=${debugString}`)
     }
 
     if (code) {
@@ -33,9 +41,7 @@ export async function GET(request: Request) {
                                 cookieStore.set(name, value, options)
                             )
                         } catch {
-                            // The `setAll` method was called from a Server Component.
-                            // This can be ignored if you have middleware refreshing
-                            // user sessions.
+                            // Cookie set error
                         }
                     },
                 },
@@ -46,10 +52,10 @@ export async function GET(request: Request) {
             return NextResponse.redirect(`${origin}${next}`)
         } else {
             console.error('Auth Code Exchange Error:', error)
-            return NextResponse.redirect(`${origin}/auth/auth-code-error?error=${encodeURIComponent(error.message)}`)
+            return NextResponse.redirect(`${origin}/auth/auth-code-error?error=${encodeURIComponent(error.message)}&debug=${debugString}`)
         }
     }
 
-    // Return the user to an error page with instructions
-    return NextResponse.redirect(`${origin}/auth/auth-code-error?error=no_code_received`)
+    // No code found
+    return NextResponse.redirect(`${origin}/auth/auth-code-error?error=no_code_received&debug=${debugString}`)
 }
