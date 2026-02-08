@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Space_Mono } from "next/font/google";
 import { DeepWorkProvider } from "@/components/providers/deep-work-provider";
-import { SidebarProvider } from "@/components/providers/sidebar-provider";
+// import { SidebarProvider } from "@/components/providers/sidebar-provider";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import "./globals.css";
 
@@ -38,9 +38,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           <DeepWorkProvider>
-            <SidebarProvider>
-              {children}
-            </SidebarProvider>
+            {children}
           </DeepWorkProvider>
         </AuthProvider>
       </body>

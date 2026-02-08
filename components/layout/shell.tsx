@@ -1,8 +1,8 @@
 "use client"
 
+import { Navbar } from "@/components/layout/navbar"
 import { Sidebar } from "@/components/layout/sidebar"
-import { useSidebar } from "@/components/providers/sidebar-provider"
-import { motion } from "framer-motion"
+import { BackButton } from "@/components/ui/back-button"
 import { useAuth } from "@/components/providers/auth-provider"
 import { useRouter, usePathname } from "next/navigation"
 import * as React from "react"
@@ -12,42 +12,33 @@ interface ShellProps {
 }
 
 export function Shell({ children }: ShellProps) {
-    const { isCollapsed } = useSidebar()
     const { isAuthenticated, isOnboarding } = useAuth()
     const router = useRouter()
     const pathname = usePathname()
 
     React.useEffect(() => {
-        // Allow public access to Landing Page and Onboarding
         if (pathname === "/" || pathname === "/onboarding") return
 
-        // If not authenticated and not loading (isOnboarding is effectively loading state here for auth check)
         if (!isAuthenticated && !isOnboarding) {
             router.push("/")
         }
     }, [isAuthenticated, isOnboarding, pathname, router])
 
+    const showNav = isAuthenticated && pathname !== "/" && pathname !== "/onboarding"
+
     return (
-        <div className="flex h-screen overflow-hidden bg-[var(--color-bg-primary)]">
-            <Sidebar />
-            <motion.main
-                initial={false}
-                animate={{ marginLeft: isCollapsed ? 80 : 260 }}
-                transition={{ duration: 0.3 }}
-                className="flex-1 overflow-y-auto p-8 relative w-full"
-            >
+        <div className="min-h-screen bg-[var(--color-bg-primary)] flex flex-col">
+            {showNav && <Navbar />}
+            {showNav && <Sidebar />}
+
+            <main className={`flex-1 p-8 w-full transition-all duration-300 ${showNav ? 'lg:pl-72' : ''}`}>
                 <div className="mx-auto max-w-7xl space-y-8">
-                    {pathname !== "/dashboard" && (
-                        <button
-                            onClick={() => router.back()}
-                            className="flex items-center gap-2 text-gray-500 hover:text-black font-bold uppercase text-xs mb-4 transition-colors"
-                        >
-                            <span className="text-lg">←</span> Back
-                        </button>
+                    {pathname !== "/dashboard" && pathname !== "/" && (
+                        <BackButton />
                     )}
                     {children}
                 </div>
-            </motion.main>
+            </main>
         </div>
     )
 }

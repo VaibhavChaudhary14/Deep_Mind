@@ -1,6 +1,7 @@
 
 "use client"
 
+import { Shell } from "@/components/layout/shell"
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { Trophy, Medal, Crown, User } from "lucide-react"
@@ -41,22 +42,13 @@ export default function LeaderboardPage() {
         }
 
         fetchLeaderboard()
-
-        // Real-time subscription? 
-        // For MVP, just fetch once.
     }, [])
 
     return (
-        <main className="min-h-screen bg-[#FBF9F1] p-4 md:p-8">
-            <div className="max-w-4xl mx-auto space-y-8">
-                <header className="flex items-center justify-between">
+        <Shell>
+            <div className="space-y-6">
+                <header className="flex items-center justify-between mb-8">
                     <div className="space-y-1">
-                        <button
-                            onClick={() => window.history.back()}
-                            className="flex items-center gap-2 text-gray-400 hover:text-black font-mono text-xs uppercase mb-2 group transition-colors"
-                        >
-                            <span className="group-hover:-translate-x-1 transition-transform">←</span> Back to Dashboard
-                        </button>
                         <h1 className="text-4xl font-black uppercase tracking-tighter flex items-center gap-3">
                             <Trophy className="text-[#FFD600]" size={40} strokeWidth={3} />
                             Global Rankings
@@ -80,7 +72,7 @@ export default function LeaderboardPage() {
                         ) : profiles.map((profile, index) => {
                             const rank = index + 1
                             const isMe = profile.id === currentUser
-                            const { level, title } = getLevelFn(profile.xp || 0)
+                            const { level } = getLevelFn(profile.xp || 0)
 
                             return (
                                 <motion.div
@@ -136,6 +128,6 @@ export default function LeaderboardPage() {
                     </div>
                 </div>
             </div>
-        </main>
+        </Shell>
     )
 }

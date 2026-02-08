@@ -53,12 +53,12 @@ export function GoalColumn({ type, color, icon: Icon }: GoalColumnProps) {
     }
 
     return (
-        <div className={cn("neo-card h-full flex flex-col min-h-[500px]", color)}>
+        <div className={cn("neo-card h-full flex flex-col min-h-[300px]", color)}>
             <div className="flex items-center gap-2 mb-4 border-b-2 border-black pb-4">
                 <div className="p-2 bg-black text-white border-2 border-white shadow-[2px_2px_0px_0px_rgba(0,0,0,0.5)]">
                     <Icon size={20} />
                 </div>
-                <h3 className="font-black font-mono text-xl uppercase">{type} Targets</h3>
+                <h3 className="font-black font-mono text-lg uppercase">{type} Targets</h3>
             </div>
 
             {/* List */}

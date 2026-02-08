@@ -1,9 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Sparkles, X, Wand2 } from "lucide-react"
+import { AnimatePresence } from "framer-motion"
+import { Wand2 } from "lucide-react"
 import { db } from "@/lib/db"
+import { Modal } from "@/components/ui/modal"
 
 interface RoadmapGeneratorProps {
     isOpen: boolean
@@ -90,50 +91,39 @@ export function RoadmapGenerator({ isOpen, onClose }: RoadmapGeneratorProps) {
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <motion.div
-                        initial={{ scale: 0.95, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0.95, opacity: 0 }}
-                        className="w-full max-w-lg bg-[#0B0F14] border border-gray-800 rounded-2xl p-6 relative"
+                <Modal
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    title="AI Plan Generator"
+                    headerColor="bg-purple-400"
+                >
+                    <div className="mb-4 text-sm text-gray-500">
+                        <p className="mb-2">Paste your learning plan or type a list of topics. The AI will structure it into weeks.</p>
+                        <div className="bg-gray-100 p-2 rounded border border-gray-200 font-mono text-xs text-gray-500">
+                            Week 1: Advanced React Patterns<br />
+                            - Learn UseEffect deep dive<br />
+                            - Build Custom Hooks<br />
+                            Week 2: Backend with Go<br />
+                            - Goroutines basics
+                        </div>
+                    </div>
+
+                    <textarea
+                        className="w-full h-40 bg-white border-2 border-black p-4 font-mono text-sm focus:bg-[#E0F2E9] focus:outline-none transition-colors mb-4"
+                        placeholder="Paste your plan here..."
+                        value={prompt}
+                        onChange={e => setPrompt(e.target.value)}
+                    />
+
+                    <button
+                        onClick={handleGenerate}
+                        disabled={isGenerating || !prompt.trim()}
+                        className="w-full bg-black text-white font-bold py-3 uppercase font-mono flex items-center justify-center gap-2 transition-all hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-[#00FF94] hover:text-black border-2 border-transparent hover:border-black disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-xl font-bold flex items-center gap-2">
-                                <Sparkles className="text-purple-400" />
-                                AI Plan Generator
-                            </h3>
-                            <button onClick={onClose}><X size={20} /></button>
-                        </div>
-
-                        <div className="mb-4 text-sm text-[var(--color-text-secondary)]">
-                            <p className="mb-2">Paste your learning plan or type a list of topics. The AI will structure it into weeks.</p>
-                            <div className="bg-gray-900 p-2 rounded border border-gray-800 font-mono text-xs text-gray-500">
-                                Week 1: Advanced React Patterns<br />
-                                - Learn UseEffect deep dive<br />
-                                - Build Custom Hooks<br />
-                                Week 2: Backend with Go<br />
-                                - Goroutines basics
-                            </div>
-                        </div>
-
-                        <textarea
-                            className="w-full h-40 bg-[var(--color-bg-secondary)] border border-gray-700 rounded-xl p-4 font-mono text-sm focus:border-purple-500 focus:outline-none transition-colors"
-                            placeholder="Paste your plan here..."
-                            value={prompt}
-                            onChange={e => setPrompt(e.target.value)}
-                        />
-
-                        <button
-                            onClick={handleGenerate}
-                            disabled={isGenerating || !prompt.trim()}
-                            className="w-full mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {isGenerating ? <span className="animate-spin">⏳</span> : <Wand2 size={20} />}
-                            Generate Roadmap
-                        </button>
-
-                    </motion.div>
-                </div>
+                        {isGenerating ? <span className="animate-spin">⏳</span> : <Wand2 size={20} />}
+                        Generate Roadmap
+                    </button>
+                </Modal>
             )}
         </AnimatePresence>
     )
