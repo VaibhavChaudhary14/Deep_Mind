@@ -18,20 +18,22 @@ import {
     Sparkles,
     Kanban,
     Target,
-    LogOut
+    LogOut,
+    Trophy
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
     { name: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
-    { name: "Goals", icon: Target, href: "/goals" },
     { name: "Career Connect", icon: Sparkles, href: "/career-connect" },
-    { name: "Roadmap", icon: Map, href: "/roadmap" },
+    { name: "Deep Work", icon: Timer, href: "/deep-work" },
     { name: "Tasks", icon: Kanban, href: "/todos" },
     { name: "Projects", icon: Code2, href: "/projects" },
+    { name: "Goals", icon: Target, href: "/goals" },
     { name: "Skills", icon: BarChart3, href: "/skills" },
+    { name: "Leaderboard", icon: Trophy, href: "/leaderboard" },
+    { name: "Roadmap", icon: Map, href: "/roadmap" },
     { name: "Placements", icon: Briefcase, href: "/placements" },
-    { name: "Deep Work", icon: Timer, href: "/deep-work" },
     { name: "Settings", icon: Settings, href: "/settings" },
 ]
 
@@ -43,6 +45,8 @@ import { EditProfileModal } from "@/components/features/settings/edit-profile-mo
 import { useLiveQuery } from "dexie-react-hooks"
 import { db } from "@/lib/db"
 import { useAuth } from "@/components/providers/auth-provider"
+import { useXP } from "@/store/use-xp"
+import { useEffect } from "react"
 
 export function Sidebar() {
     const pathname = usePathname()
@@ -53,8 +57,14 @@ export function Sidebar() {
     // Fetch user settings (first record)
     const settings = useLiveQuery(() => db.settings.orderBy('id').first())
 
-    const username = settings?.role || "Engineer"
-    const title = settings?.title || "L3 • SDE II"
+    const username = settings?.role || "Member"
+    // const title = settings?.title || "Level 1 • Novice" // Use Store Title instead
+
+    const { xp, level, title, progress, fetchXP } = useXP()
+
+    useEffect(() => {
+        fetchXP()
+    }, [])
 
     return (
         <motion.aside
@@ -145,6 +155,25 @@ export function Sidebar() {
                         <button onClick={logout} className="text-gray-500 hover:text-red-500">
                             <LogOut size={16} />
                         </button>
+                    </div>
+                )}
+
+                {/* XP Progress Bar (Always Visible if Expanded, Minimal if collapsed?) */}
+                {!isCollapsed && (
+                    <div className="mt-2" onClick={() => fetchXP()}>
+                        <div className="flex justify-between text-[10px] font-mono font-bold mb-1">
+                            <span>LVL {level}</span>
+                            <span>{Math.floor(progress)}%</span>
+                        </div>
+                        <div className="h-2 w-full bg-white border-2 border-black rounded-full overflow-hidden">
+                            <motion.div
+                                className="h-full bg-[var(--color-mustard)]"
+                                initial={{ width: 0 }}
+                                animate={{ width: `${progress}%` }}
+                                transition={{ duration: 0.5 }}
+                            />
+                        </div>
+                        <div className="text-[9px] text-center font-mono mt-1 text-gray-500 uppercase">{title}</div>
                     </div>
                 )}
             </div>

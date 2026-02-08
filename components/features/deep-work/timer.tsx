@@ -1,30 +1,49 @@
+
 "use client"
 
 import * as React from "react"
-import { motion } from "framer-motion"
-import { Play, Pause, RotateCcw, Coffee } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { Play, Pause, RotateCcw, Volume2, VolumeX, CheckCircle, Coffee, Brain } from "lucide-react"
 import { useDeepWork } from "@/components/providers/deep-work-provider"
 import { cn } from "@/lib/utils"
+import { useXP } from "@/store/use-xp"
+import { XP_VALUES } from "@/lib/gamification"
+// import useSound from 'use-sound' // Future scope
 
-const FOCUS_TIME = 50 * 60 // 50 minutes
-const BREAK_TIME = 10 * 60 // 10 minutes
+interface TimerProps {
+    defaultFocusMinutes?: number
+    isLapMode?: boolean
+}
 
-export function DeepWorkTimer() {
+export function DeepWorkTimer({ defaultFocusMinutes = 25, isLapMode = false }: TimerProps) {
+    const MODES = {
+        focus: { label: "Deep Work", minutes: defaultFocusMinutes, color: "text-[#00C2FF]", icon: Brain },
+        shortBreak: { label: "Short Break", minutes: 5, color: "text-[#00FF94]", icon: Coffee },
+        longBreak: { label: "Long Break", minutes: 15, color: "text-[#FFD600]", icon: Coffee },
+    }
+
+    // ... existing state ...
+    // Note: We need to initialize state inside, but MODES relies on props. 
+    // Wait, useState initializer only runs once. If props change, it won't update.
+    // However, for this use case, the component is mounted with static props per page.
+
     const { isDeepWork, toggleDeepWork } = useDeepWork()
-    const [timeLeft, setTimeLeft] = React.useState(FOCUS_TIME)
+    const [mode, setMode] = React.useState<keyof typeof MODES>("focus")
+    const [timeLeft, setTimeLeft] = React.useState(defaultFocusMinutes * 60)
     const [isActive, setIsActive] = React.useState(false)
-    const [mode, setMode] = React.useState<"focus" | "break">("focus")
+    const [sessionsCompleted, setSessionsCompleted] = React.useState(0)
+    const [laps, setLaps] = React.useState<number[]>([]) // Store lap durations or timestamps? simple count for now.
 
+    // Timer Logic
     React.useEffect(() => {
         let interval: NodeJS.Timeout | null = null
 
         if (isActive && timeLeft > 0) {
             interval = setInterval(() => {
-                setTimeLeft((time) => time - 1)
+                setTimeLeft((prev) => prev - 1)
             }, 1000)
         } else if (timeLeft === 0) {
-            setIsActive(false)
-            // Play sound here ideally
+            handleTimerComplete()
         }
 
         return () => {
@@ -32,120 +51,139 @@ export function DeepWorkTimer() {
         }
     }, [isActive, timeLeft])
 
-    const toggleTimer = () => {
-        setIsActive(!isActive)
-        if (!isDeepWork && mode === "focus") {
-            toggleDeepWork() // Auto-enable deep work mode on start
+    // Sync Deep Work Mode
+    React.useEffect(() => {
+        if (isActive && mode === "focus" && !isDeepWork) {
+            toggleDeepWork()
+        } else if (!isActive && isDeepWork) {
+            toggleDeepWork() // Exit deep work if paused/stopped
+        }
+    }, [isActive, mode])
+
+    const handleTimerComplete = () => {
+        setIsActive(false)
+        if (mode === "focus") {
+            const minutesCompleted = MODES[mode].minutes
+            const xpEarned = minutesCompleted * XP_VALUES.DEEP_WORK_MINUTE
+
+            // Award XP
+            useXP.getState().addXP(xpEarned, "Deep Work Session")
+            setSessionsCompleted(prev => prev + 1)
+
+            if (isLapMode) {
+                setLaps(prev => [...prev, sessionsCompleted + 1])
+            }
+
+            // Auto switch to short break
+            setMode("shortBreak")
+            setTimeLeft(MODES["shortBreak"].minutes * 60)
+        } else {
+            // Break over, back to work
+            setMode("focus")
+            setTimeLeft(MODES["focus"].minutes * 60)
         }
     }
+
+    const toggleTimer = () => setIsActive(!isActive)
 
     const resetTimer = () => {
         setIsActive(false)
-        setTimeLeft(mode === "focus" ? FOCUS_TIME : BREAK_TIME)
+        setTimeLeft(MODES[mode].minutes * 60)
     }
 
-    const switchMode = () => {
-        const newMode = mode === "focus" ? "break" : "focus"
+    const switchMode = (newMode: keyof typeof MODES) => {
         setMode(newMode)
-        setTimeLeft(newMode === "focus" ? FOCUS_TIME : BREAK_TIME)
+        setTimeLeft(MODES[newMode].minutes * 60)
         setIsActive(false)
-        if (newMode === "break" && isDeepWork) {
-            toggleDeepWork() // Auto-disable deep work on break
-        }
     }
 
     const formatTime = (seconds: number) => {
         const mins = Math.floor(seconds / 60)
         const secs = seconds % 60
-        return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
     }
 
-    const progress = ((mode === "focus" ? FOCUS_TIME : BREAK_TIME) - timeLeft) / (mode === "focus" ? FOCUS_TIME : BREAK_TIME) * 100
+    const CurrentIcon = MODES[mode].icon
 
     return (
-        <div className="flex flex-col items-center justify-center p-8 space-y-8">
-            <div className="relative flex items-center justify-center w-64 h-64">
-                {/* Progress Circle Background */}
-                <svg className="absolute w-full h-full transform -rotate-90">
-                    <circle
-                        cx="128"
-                        cy="128"
-                        r="120"
-                        stroke="currentColor"
-                        strokeWidth="8"
-                        fill="transparent"
-                        className="text-gray-800"
-                    />
-                    <circle
-                        cx="128"
-                        cy="128"
-                        r="120"
-                        stroke="currentColor"
-                        strokeWidth="8"
-                        fill="transparent"
-                        strokeDasharray={2 * Math.PI * 120}
-                        strokeDashoffset={2 * Math.PI * 120 * (1 - progress / 100)}
-                        className={cn(
-                            "transition-all duration-1000",
-                            mode === "focus" ? "text-[var(--color-ml)]" : "text-[var(--color-python)]"
-                        )}
-                        strokeLinecap="round"
-                    />
-                </svg>
+        <div className="neo-card bg-black text-white p-6 relative overflow-hidden">
+            {/* Background Pulse Animation when Active */}
+            {isActive && (
+                <motion.div
+                    className="absolute inset-0 bg-[#00C2FF] opacity-10"
+                    animate={{ opacity: [0.1, 0.2, 0.1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                />
+            )}
 
-                {/* Timer Text */}
-                <div className="absolute flex flex-col items-center">
-                    <span className="text-6xl font-mono font-bold tracking-tighter">
+            <div className="relative z-10">
+                {/* Header / Mode Switcher */}
+                <div className="flex justify-between items-center mb-6">
+                    <div className="flex gap-2">
+                        {(Object.keys(MODES) as Array<keyof typeof MODES>).map((m) => (
+                            <button
+                                key={m}
+                                onClick={() => switchMode(m)}
+                                className={cn(
+                                    "px-2 py-1 text-xs font-bold uppercase border-2",
+                                    mode === m ? "bg-white text-black border-white" : "border-gray-700 text-gray-500 hover:border-gray-500"
+                                )}
+                            >
+                                {MODES[m].label}
+                            </button>
+                        ))}
+                    </div>
+                    <div className="flex items-center gap-1 text-xs font-mono text-gray-400">
+                        <CheckCircle size={14} />
+                        <span>{sessionsCompleted} SESSIONS</span>
+                    </div>
+                </div>
+
+                {/* Timer Display */}
+                <div className="text-center py-4">
+                    <motion.div
+                        key={mode}
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className={cn("text-7xl font-black font-mono tracking-tighter tabular-nums", MODES[mode].color)}
+                    >
                         {formatTime(timeLeft)}
-                    </span>
-                    <span className="text-sm uppercase tracking-widest text-[var(--color-text-muted)] mt-2">
-                        {mode === "focus" ? "Deep Work" : "Rest & Recharge"}
-                    </span>
+                    </motion.div>
+                    <div className="text-gray-400 font-bold uppercase tracking-widest mt-1 flex items-center justify-center gap-2">
+                        <CurrentIcon size={16} />
+                        {isActive ? "Focusing..." : "Ready"}
+                    </div>
+                </div>
+
+                {/* Lap Indicators */}
+                {isLapMode && laps.length > 0 && (
+                    <div className="flex justify-center gap-1 mb-4">
+                        {laps.map((lap, i) => (
+                            <div key={i} className="w-8 h-2 bg-[#00C2FF] rounded-full" />
+                        ))}
+                    </div>
+                )}
+
+                {/* Controls */}
+                <div className="flex justify-center items-center gap-4 mt-6">
+                    <button
+                        onClick={toggleTimer}
+                        className={cn(
+                            "w-16 h-16 rounded-full flex items-center justify-center border-4 border-white transition-all shadow-[0px_0px_20px_rgba(255,255,255,0.2)]",
+                            isActive ? "bg-red-500 hover:bg-red-600" : "bg-[#00FF94] text-black hover:scale-110"
+                        )}
+                    >
+                        {isActive ? <Pause size={32} fill="white" /> : <Play size={32} fill="black" className="ml-1" />}
+                    </button>
+
+                    <button
+                        onClick={resetTimer}
+                        className="p-3 rounded-full border-2 border-gray-700 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
+                    >
+                        <RotateCcw size={20} />
+                    </button>
                 </div>
             </div>
-
-            {/* Controls */}
-            <div className="flex items-center gap-6">
-                <button
-                    onClick={resetTimer}
-                    className="p-4 bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-gray-100 hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-0 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
-                >
-                    <RotateCcw size={24} strokeWidth={3} />
-                </button>
-
-                <button
-                    onClick={toggleTimer}
-                    className={cn(
-                        "p-6 border-4 border-black transition-all transform hover:translate-y-[-4px] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] active:translate-y-0 active:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
-                        isActive
-                            ? "bg-[#FF5C00] text-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
-                            : mode === "focus"
-                                ? "bg-[#00FF94] text-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
-                                : "bg-[#00C2FF] text-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
-                    )}
-                >
-                    {isActive ? <Pause size={32} fill="currentColor" strokeWidth={3} /> : <Play size={32} fill="currentColor" className="ml-1" strokeWidth={3} />}
-                </button>
-
-                <button
-                    onClick={switchMode}
-                    className="p-4 bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-gray-100 hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-0 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
-                    title={mode === "focus" ? "Switch to Break" : "Switch to Focus"}
-                >
-                    <Coffee size={24} strokeWidth={3} />
-                </button>
-            </div>
-
-            {/* Motivational Text */}
-            {isActive && mode === "focus" && (
-                <motion.p
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-[var(--color-text-muted)] text-sm italic"
-                >
-                    "Discipline allows magic. Be magical."
-                </motion.p>
-            )}
         </div>
     )
 }

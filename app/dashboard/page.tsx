@@ -10,13 +10,16 @@ import { useExecutionScore } from "@/hooks/use-execution-score"
 import { useAnalytics } from "@/hooks/use-analytics"
 import { HoursChart } from "@/components/features/analytics/hours-chart"
 import { FocusChart } from "@/components/features/analytics/focus-chart"
+import { ActivityHeatmap } from "@/components/features/analytics/activity-heatmap"
 import { LogModal } from "@/components/features/logs/log-modal"
 import { LogHistoryModal } from "@/components/features/logs/log-history-modal"
+import { DeepWorkTimer } from "@/components/features/deep-work/timer"
 import { ArrowUpRight, CheckCircle2, Clock, Globe, Plus, Trophy } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { WeeklyGoalCard } from "@/components/features/goals/weekly-goal-card"
 import { useLiveQuery } from "dexie-react-hooks"
 import { db } from "@/lib/db"
+import { useXP } from "@/store/use-xp"
 
 import { syncData } from "@/lib/sync"
 
@@ -30,6 +33,7 @@ export default function DashboardPage() {
   }, [isAuthenticated])
   const { score, details } = useExecutionScore()
   const { hoursData, focusData } = useAnalytics()
+  const { title, level, xp } = useXP()
   const projects = useLiveQuery(() => db.projects.toArray())
   const [isLogModalOpen, setIsLogModalOpen] = React.useState(false)
   const [isHistoryOpen, setIsHistoryOpen] = React.useState(false)
@@ -70,8 +74,8 @@ export default function DashboardPage() {
             <Trophy className="text-yellow-400" />
           </div>
           <div>
-            <div className="text-3xl font-mono font-bold">{score >= 90 ? 'S-Tier' : score >= 70 ? 'A-Tier' : 'B-Tier'}</div>
-            <div className="text-xs text-gray-400 mt-1">Top 5% of Operators</div>
+            <div className="text-xl font-mono font-black uppercase text-[#FFD600]">{title}</div>
+            <div className="text-xs text-gray-400 mt-1 font-bold">LVL {level} • {xp.toLocaleString()} XP</div>
           </div>
         </div>
       </div>
@@ -96,20 +100,25 @@ export default function DashboardPage() {
             <HoursChart data={hoursData} />
           </section>
 
+          {/* Activity Heatmap */}
+          <section className="neo-card min-h-[200px]">
+            <h3 className="font-bold text-xl font-mono mb-6">Consistency Graph</h3>
+            <ActivityHeatmap />
+          </section>
+
           <section>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold font-mono bg-[var(--color-mustard)] inline-block px-2 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                CURRENT FOCUS
+                DEEP WORK STATION
               </h2>
             </div>
+            <DeepWorkTimer />
+
             <button
               onClick={() => setIsLogModalOpen(true)}
-              className="w-full neo-card h-32 flex flex-col items-center justify-center border-4 border-black bg-black text-white hover:bg-[#FFD600] hover:text-black transition-all shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-4px] active:translate-y-0 active:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] group"
+              className="w-full mt-4 py-3 bg-white border-2 border-black font-black uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-[#FFD600] flex items-center justify-center gap-2 transition-all active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
             >
-              <div className="bg-white text-black rounded-full p-2 mb-2 group-hover:bg-black group-hover:text-[#FFD600] border-2 border-transparent group-hover:border-black transition-colors">
-                <Plus size={32} strokeWidth={3} />
-              </div>
-              <span className="font-black font-mono text-xl uppercase tracking-tighter">Log Mission</span>
+              <Plus size={20} /> Log Manual Session
             </button>
           </section>
 
@@ -127,7 +136,7 @@ export default function DashboardPage() {
                         {project.status} • {project.tech_stack.slice(0, 2).join(', ')}
                       </p>
                     </div>
-                    {project.status === 'Ship' && (
+                    {project.status === 'Done' && (
                       <span className="px-2 py-1 rounded bg-green-200 border-2 border-black text-xs font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">DEPLOYED</span>
                     )}
                   </div>

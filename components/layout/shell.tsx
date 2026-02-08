@@ -28,8 +28,6 @@ export function Shell({ children }: ShellProps) {
     }, [isAuthenticated, isOnboarding, pathname, router])
 
     return (
-
-
         <div className="flex h-screen overflow-hidden bg-[var(--color-bg-primary)]">
             <Sidebar />
             <motion.main
@@ -39,6 +37,14 @@ export function Shell({ children }: ShellProps) {
                 className="flex-1 overflow-y-auto p-8 relative w-full"
             >
                 <div className="mx-auto max-w-7xl space-y-8">
+                    {pathname !== "/dashboard" && (
+                        <button
+                            onClick={() => router.back()}
+                            className="flex items-center gap-2 text-gray-500 hover:text-black font-bold uppercase text-xs mb-4 transition-colors"
+                        >
+                            <span className="text-lg">←</span> Back
+                        </button>
+                    )}
                     {children}
                 </div>
             </motion.main>

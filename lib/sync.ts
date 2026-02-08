@@ -2,6 +2,7 @@
 import { db } from "./db"
 import { supabase } from "./supabase"
 import { Log, Project, Skill, Application } from "./db"
+import { calculateStreak } from "./gamification"
 
 export async function syncData() {
     const { data: { user } } = await supabase.auth.getUser()
@@ -34,19 +35,14 @@ export async function syncData() {
             .upsert(localLogs.map(log => ({
                 ...log,
                 user_id: user.id
-            })), { onConflict: 'id, date' }) // Strategy: Last write wins based on ID usually, but here ID might collide if not careful.
-        // Better strategy for V1: Just push all local to remote, let remote handle IDs if we used UUIDs. 
-        // Since we use auto-increment locally, mapping is hard. 
-        // Simplified Sync: Push local to remote as "new" if not exists?
-        // REALISTIC MVP SYNC: Overwrite specific tables based on "last_updated".
+            })), { onConflict: 'id, date' })
 
         if (error) console.error("Logs sync error:", error)
     }
 
-    // 3. Sync Skills (Smart Sync: Match by Name)
+    // 3. Sync Skills (Smart Sync: Match by Name to prevent ID conflicts)
     const localSkills = await db.skills.toArray()
     if (localSkills.length > 0) {
-        // Fetch existing remote skills to map IDs
         const { data: remoteSkills, error: fetchError } = await supabase
             .from('skills')
             .select('id, name')
@@ -57,27 +53,41 @@ export async function syncData() {
         } else {
             const remoteMap = new Map(remoteSkills?.map(s => [s.name, s.id]))
 
-            const payload = localSkills.map(skill => {
-                // If skill exists remotely, attach its UUID/BigInt ID. 
-                // If not, exclude ID to let Supabase generate it.
-                // We DO NOT use local 'id' (number) for remote 'id' (bigint/uuid).
-                const remoteId = remoteMap.get(skill.name)
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const { id: localId, ...skillData } = skill
+            const updates: any[] = []
+            const inserts: any[] = []
 
-                return {
-                    ...skillData,
-                    id: remoteId, // undefined if new, existing ID if update
+            localSkills.forEach(skill => {
+                const remoteId = remoteMap.get(skill.name)
+
+                const payload = {
                     user_id: user.id,
-                    updated_at: new Date().toISOString() // Ensure timestamp update
+                    name: skill.name,
+                    category: skill.category,
+                    current_level: skill.current_level,
+                    target_level: skill.target_level,
+                    last_updated: new Date().toISOString()
+                }
+
+                if (remoteId) {
+                    updates.push({ ...payload, id: remoteId })
+                } else {
+                    inserts.push(payload)
                 }
             })
 
-            const { error } = await supabase
-                .from('skills')
-                .upsert(payload, { onConflict: 'id' }) // Use ID as conflict target (implied primary key)
+            if (updates.length > 0) {
+                const { error } = await supabase
+                    .from('skills')
+                    .upsert(updates, { onConflict: 'id' })
+                if (error) console.error("Skills update error:", JSON.stringify(error, null, 2))
+            }
 
-            if (error) console.error("Skills sync error:", JSON.stringify(error, null, 2))
+            if (inserts.length > 0) {
+                const { error } = await supabase
+                    .from('skills')
+                    .insert(inserts)
+                if (error) console.error("Skills insert error:", JSON.stringify(error, null, 2))
+            }
         }
     }
 

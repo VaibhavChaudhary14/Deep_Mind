@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/components/providers/auth-provider"
 
-const ROLES = ["Software Engineer", "Product Manager", "Designer", "Founder", "Student", "Researcher", "Creative", "Other"]
+const ROLES = ["Software Engineer", "Product Manager", "Designer", "Writer", "Marketer", "Researcher", "Founder", "Creative", "Student", "Other"]
 const LEVELS = ["Junior (L1/L2)", "Mid-Level (L3/L4)", "Senior (L5+)", "Staff/Principal", "Intern/Student"]
 
 const SUGGESTED_GOALS = [

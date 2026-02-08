@@ -3,7 +3,7 @@
 import { useDeepWork } from "@/components/providers/deep-work-provider"
 import { useExecutionScore } from "@/hooks/use-execution-score"
 import { Flame, Sun, Timer } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn, triggerFireConfetti } from "@/lib/utils"
 
 export function Header() {
     const { isDeepWork, toggleDeepWork } = useDeepWork()
@@ -28,10 +28,13 @@ export function Header() {
                 </div>
 
                 {/* Streak Badge */}
-                <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                    <Flame className="w-5 h-5 text-orange-500 fill-orange-500" />
+                <button
+                    onClick={() => triggerFireConfetti()}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-orange-50 transition-colors active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                >
+                    <Flame className="w-5 h-5 text-orange-500 fill-orange-500 animate-pulse" />
                     <span className="font-bold font-mono text-black">{details.streak} Day Streak</span>
-                </div>
+                </button>
 
                 {/* Deep Work Toggle */}
                 <button

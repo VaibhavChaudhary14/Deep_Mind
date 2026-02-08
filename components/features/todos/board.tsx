@@ -1,8 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { useLiveQuery } from "dexie-react-hooks"
 import { db, Todo } from "@/lib/db"
+import { useLiveQuery } from "dexie-react-hooks"
+import { useXP } from "@/store/use-xp"
+import { XP_VALUES } from "@/lib/gamification"
 import { motion, AnimatePresence, PanInfo } from "framer-motion"
 import { Plus, GripVertical, Trash2, AlertCircle, CheckCircle, Clock } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -34,7 +36,12 @@ export function TodoBoard() {
     }
 
     const handleUpdateStatus = async (id: number, newStatus: Todo['status']) => {
+        const task = todos?.find(t => t.id === id)
         await db.todos.update(id, { status: newStatus })
+
+        if (newStatus === 'Done' && task?.status !== 'Done') {
+            useXP.getState().addXP(XP_VALUES.TASK_COMPLETE, "Task Completed")
+        }
     }
 
     const handleDelete = async (id: number) => {

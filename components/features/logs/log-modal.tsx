@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion"
 import { X, Calendar, Clock, ArrowRight, Check, Zap } from "lucide-react"
 import { db, Log } from "@/lib/db"
 import { cn } from "@/lib/utils"
+import { useXP } from "@/store/use-xp"
+import { XP_VALUES } from "@/lib/gamification"
 
 interface LogModalProps {
     isOpen: boolean
@@ -13,12 +15,12 @@ interface LogModalProps {
 }
 
 const FOCUS_AREAS = [
-    { id: 'Python', label: 'Python', color: 'bg-[#00C2FF]' },
-    { id: 'Math', label: 'Math', color: 'bg-[#9D00FF]' },
-    { id: 'ML', label: 'ML', color: 'bg-[#00FF94]' },
+    { id: 'Deep Work', label: 'Deep Work', color: 'bg-[#00C2FF]' },
+    { id: 'Learning', label: 'Learning', color: 'bg-[#FFD600]' },
     { id: 'Projects', label: 'Projects', color: 'bg-[#FF5C00]' },
-    { id: 'Deployment', label: 'Deploy', color: 'bg-[#FFD600]' },
-    { id: 'Revision', label: 'Review', color: 'bg-[#FF00FF]' },
+    { id: 'Planning', label: 'Planning', color: 'bg-[#9D00FF]' },
+    { id: 'Outreach', label: 'Outreach', color: 'bg-[#00FF94]' },
+    { id: 'Admin', label: 'Admin', color: 'bg-gray-400' },
 ]
 
 const MOODS = [
@@ -78,6 +80,13 @@ export function LogModal({ isOpen, onClose, logToEdit }: LogModalProps) {
                 await db.logs.update(logToEdit.id, payload)
             } else {
                 await db.logs.add(payload)
+                // Award XP for new log
+                // useXP.getState().addXP(XP_VALUES.DAILY_LOG, "Daily Log") // Can't use hook inside async function easily without getState or passing it in.
+                // Actually, I can use the hook in the component and passing the function.
+                // But wait, `useXP` is a hook. I can import the store directly if I need to use it outside, 
+                // BUT `useXP` is created with `create` from zustand, so it acts as both a hook and a store.
+                // So `useXP.getState().addXP(...)` is valid!
+                useXP.getState().addXP(XP_VALUES.DAILY_LOG, "Daily Log Check-in")
             }
 
             onClose()

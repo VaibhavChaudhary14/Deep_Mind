@@ -4,7 +4,7 @@ export interface Log {
     id?: number;
     date: string; // ISO YYYY-MM-DD
     hours_studied: number;
-    focus_area: 'Python' | 'Math' | 'ML' | 'Projects' | 'Deployment' | 'Revision';
+    focus_area: 'Deep Work' | 'Learning' | 'Projects' | 'Planning' | 'Outreach' | 'Admin';
     tasks_completed: number;
     deep_work_intervals: number;
     mood: 'Fire' | 'Neutral' | 'Tired';
@@ -18,8 +18,8 @@ export interface Log {
 export interface Project {
     id?: number;
     name: string;
-    status: 'Idea' | 'Build' | 'Polish' | 'Ship' | 'Archived';
-    tech_stack: string[];
+    status: 'Idea' | 'Draft' | 'In Progress' | 'Review' | 'Done' | 'Archived';
+    tech_stack: string[]; // Can be "Tools Used"
     github_url?: string;
     demo_url?: string;
     hire_signal: boolean; // Computed or manual
@@ -46,8 +46,8 @@ export interface Settings {
     id?: number; // Singleton, likely 1
     theme: 'dark' | 'light' | 'deep-work';
     username: string;
-    role?: string; // e.g. "Engineer"
-    title?: string; // e.g. "L3 • SDE II"
+    role?: string; // e.g. "Product Designer"
+    title?: string; // e.g. "Senior Associate"
     level?: string; // e.g. "Level 4"
     streak: number;
     execution_score: number;

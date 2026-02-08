@@ -41,12 +41,12 @@ export function HoursChart({ data }: { data: any[] }) {
                     }}
                     itemStyle={{ color: '#000' }}
                 />
-                <Bar dataKey="Python" stackId="a" fill="#00C2FF" stroke="#000" strokeWidth={2} />
-                <Bar dataKey="Math" stackId="a" fill="#9D00FF" stroke="#000" strokeWidth={2} />
-                <Bar dataKey="ML" stackId="a" fill="#00FF94" stroke="#000" strokeWidth={2} />
+                <Bar dataKey="Deep Work" stackId="a" fill="#00C2FF" stroke="#000" strokeWidth={2} />
+                <Bar dataKey="Learning" stackId="a" fill="#FFD600" stroke="#000" strokeWidth={2} />
                 <Bar dataKey="Projects" stackId="a" fill="#FF5C00" stroke="#000" strokeWidth={2} />
-                <Bar dataKey="Deployment" stackId="a" fill="#FFD600" stroke="#000" strokeWidth={2} />
-                <Bar dataKey="Revision" stackId="a" fill="#FF00FF" stroke="#000" strokeWidth={2} />
+                <Bar dataKey="Planning" stackId="a" fill="#9D00FF" stroke="#000" strokeWidth={2} />
+                <Bar dataKey="Outreach" stackId="a" fill="#00FF94" stroke="#000" strokeWidth={2} />
+                <Bar dataKey="Admin" stackId="a" fill="#9CA3AF" stroke="#000" strokeWidth={2} />
             </BarChart>
         </ResponsiveContainer>
     )

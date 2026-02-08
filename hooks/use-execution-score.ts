@@ -2,6 +2,7 @@
 
 import { useLiveQuery } from "dexie-react-hooks"
 import { db } from "@/lib/db"
+import { calculateStreak } from "@/lib/gamification"
 
 export function useExecutionScore() {
     const settings = useLiveQuery(() => db.settings.orderBy('id').first())
@@ -17,12 +18,12 @@ export function useExecutionScore() {
 
     // 1. Consistency Score (30%)
     // Based on streak (max 30 days)
-    const streak = settings?.streak || 0
+    const streak = calculateStreak(logs)
     const consistencyScore = Math.min(streak, 30)
 
     // 2. Output Score (40%)
     // Based on shipped projects (Hire Ready = 10pts, Others = 2pts)
-    const shipppedProjects = projects.filter(p => p.status === 'Ship').length
+    const shipppedProjects = projects.filter(p => p.status === 'Done').length
     const signalProjects = projects.filter(p => p.hire_signal).length
     // Formula: Each shipped project = 5 pts, each Hire Signal = 10 pts. Max 40.
     const rawOutput = (shipppedProjects * 5) + (signalProjects * 10)

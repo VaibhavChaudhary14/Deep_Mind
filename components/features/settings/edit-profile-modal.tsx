@@ -14,9 +14,9 @@ export function EditProfileModal({ isOpen, onClose }: { isOpen: boolean, onClose
 
     React.useEffect(() => {
         if (settings) {
-            setName(settings.username || "Engineer")
-            setRole(settings.role || "Engineer")
-            setTitle(settings.title || "L3 • SDE II")
+            setName(settings.username || "Member")
+            setRole(settings.role || "Professional")
+            setTitle(settings.title || "Level 1 • Novice")
         }
     }, [settings, isOpen])
 

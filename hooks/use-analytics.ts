@@ -23,12 +23,12 @@ export function useAnalytics() {
             date: format(new Date(dateStr), 'EEE'),
             fullDate: dateStr,
             total: 0,
-            Python: 0,
-            Math: 0,
-            ML: 0,
-            Projects: 0,
-            Deployment: 0,
-            Revision: 0
+            'Deep Work': 0,
+            'Learning': 0,
+            'Projects': 0,
+            'Planning': 0,
+            'Outreach': 0,
+            'Admin': 0
         }
 
         dayLogs.forEach(log => {

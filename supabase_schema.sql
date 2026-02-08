@@ -11,6 +11,7 @@ create table profiles (
   avatar_url text,
   deep_work_mode boolean default false,
   streak integer default 0,
+  xp integer default 0,
   updated_at timestamp with time zone,
   
   constraint username_length check (char_length(username) >= 3)
