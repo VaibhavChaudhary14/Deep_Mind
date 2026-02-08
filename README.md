@@ -4,7 +4,7 @@
 
 Deep Mind is a local-first, AI-powered career accelerator designed to help you track your work, optimize your habits, and land your dream role. It combines a Notion-style tracker with specific AI agents and a gamified progression system.
 
-![Website](https://yourdm.vercel.app/)
+Website : https://yourdm.vercel.app
 
 ## ✨ Core Features
 
