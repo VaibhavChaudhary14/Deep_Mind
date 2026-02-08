@@ -49,6 +49,21 @@ export async function GET(request: Request) {
         )
         const { error } = await supabase.auth.exchangeCodeForSession(code)
         if (!error) {
+            // Check if user is fully onboarded
+            const { data: { user } } = await supabase.auth.getUser()
+            if (user) {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('role, level')
+                    .eq('id', user.id)
+                    .single()
+
+                // If profile is missing role or level, send to onboarding
+                if (!profile?.role || !profile?.level) {
+                    return NextResponse.redirect(`${origin}/onboarding`)
+                }
+            }
+
             return NextResponse.redirect(`${origin}${next}`)
         } else {
             console.error('Auth Code Exchange Error:', error)
