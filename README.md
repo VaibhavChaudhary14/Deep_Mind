@@ -1,8 +1,8 @@
-# Career Connect 🚀
+# Deep Mind 🚀
 
 **The high-performance operating system for elite professionals.**
 
-Career Connect (formerly Deep Mind) is a local-first, AI-powered career accelerator designed to help you track your work, optimize your habits, and land your dream role. It combines a Notion-style tracker with specific AI agents and a gamified progression system.
+Deep Mind is a local-first, AI-powered career accelerator designed to help you track your work, optimize your habits, and land your dream role. It combines a Notion-style tracker with specific AI agents and a gamified progression system.
 
 ![Website](https://yourdm.vercel.app/)
 
