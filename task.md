@@ -1,0 +1,103 @@
+# Task: AI Mission Control - SaaS Transformation
+
+- [x] Create Functional Features (V1) <!-- id: 50 -->
+- [x] Implement SaaS Structure <!-- id: 70 -->
+    - [x] Create `app/dashboard` folder <!-- id: 71 -->
+    - [x] Move `app/page.tsx` to `app/dashboard/page.tsx` <!-- id: 72 -->
+    - [x] Update Sidebar links to use `/dashboard` base <!-- id: 73 -->
+    - [x] Create Landing Page (`app/page.tsx`) <!-- id: 74 -->
+- [x] Implement SaaS Features <!-- id: 80 -->
+    - [x] `LandingHero` Component (Animated) <!-- id: 81 -->
+    - [x] `PricingPage` (Free vs Pro) <!-- id: 82 -->
+    - [x] `InsightsView` (AI Coach Mock) <!-- id: 83 -->
+- [x] Verify End-to-End Flow <!-- id: 90 -->
+    - [x] Landing -> Dashboard Navigation <!-- id: 91 -->
+    - [x] Data Persistence Check <!-- id: 92 -->
+- [x] Enhance Roadmap Module <!-- id: 100 -->
+    - [x] Create `RoadmapEditor` Modal (Add/Edit Weeks) <!-- id: 101 -->
+    - [x] Implement `RoadmapGenerator` (Text to Plan Logic) <!-- id: 102 -->
+- [x] Implement Task Board (Notes & Todos) <!-- id: 110 -->
+    - [x] Update DB Schema (Todos Table) <!-- id: 111 -->
+    - [x] Build `TodoBoard` (Kanban Columns: Todo, In Progress, Done) <!-- id: 112 -->
+    - [x] Implement Drag & Drop Logic (Framer Motion) <!-- id: 113 -->
+    - [x] Add sidebar link (`/todos`) <!-- id: 114 -->
+- [x] Remove Payment Walls (Free Forever) <!-- id: 120 -->
+    - [x] Unlock `InsightsView` (Remove Blur/Lock) <!-- id: 121 -->
+    - [x] Update `PricingPage` to "Open Source/Free" <!-- id: 122 -->
+- [x] Fix Todo Add Interaction <!-- id: 130 -->
+    - [x] Make "Plus" icon clickable (Submit Button) <!-- id: 131 -->
+    - [x] Ensure Enter key works <!-- id: 132 -->
+- [x] Rebrand to "Deep Mind" (formerly Mission Control) <!-- id: 140 -->
+    - [x] Update `globals.css` (Cream, Mint, Black borders, Hard Shadows) <!-- id: 141 -->
+    - [x] Refactor `Shell` & `Sidebar` (Boxy Layout) <!-- id: 142 -->
+    - [x] Refactor Charts (Puzzle Fintech Style - Clean, Bold) <!-- id: 143 -->
+    - [x] Update `Dashboard`, `Todos`, `Roadmap` to use `.neo-card` <!-- id: 144 -->
+    - [x] Add `Space Mono` Font <!-- id: 145 -->
+- [x] Fix CSS Build Errors <!-- id: 150 -->
+- [x] Refine Colors to Solid/Bold <!-- id: 160 -->
+    - [x] Update `globals.css` (Vivid Palette) <!-- id: 161 -->
+    - [x] Update Chart Colors <!-- id: 162 -->
+- [x] Fix Layout Overlap <!-- id: 170 -->
+    - [x] Create `LayoutProvider` to manage Sidebar State <!-- id: 171 -->
+    - [x] Update `Shell` to respect Sidebar Width <!-- id: 172 -->
+- [x] Enforce Consistency & Fix Visibility <!-- id: 180 -->
+    - [x] Refactor `TodoBoard` (Bold Theme) <!-- id: 181 -->
+    - [x] Refactor `RoadmapView` (Bold Theme) <!-- id: 182 -->
+    - [x] Refactor `ProjectBoard` (Bold Theme) <!-- id: 183 -->
+    - [x] Refactor `SkillsMatrix` (Bold Theme) <!-- id: 184 -->
+- [x] Implement Dynamic User Profile <!-- id: 190 -->
+    - [x] Update DB Schema (Profile Table) <!-- id: 191 -->
+    - [x] Create `ProfileModal` (Edit Name, Role, Level) <!-- id: 192 -->
+    - [x] Connect `Sidebar` to Profile Data <!-- id: 193 -->
+- [x] Enable Project Editing <!-- id: 200 -->
+    - [x] Create `ProjectModal` (Add/Edit Logic) <!-- id: 201 -->
+    - [x] Update `ProjectBoard` to use Modal <!-- id: 202 -->
+- [x] Implement Goal System <!-- id: 210 -->
+    - [x] Update DB Schema (Goals Table: Daily, Weekly, Monthly) <!-- id: 211 -->
+    - [x] Create `GoalsWidget` (Tabs/Sections for each type) <!-- id: 212 -->
+    - [x] Add `GoalsWidget` to Dashboard <!-- id: 213 -->
+- [x] Theme All Modals <!-- id: 220 -->
+    - [x] Identify all modals <!-- id: 221 -->
+    - [x] Refactor `LogModal` (Jedi Theme) <!-- id: 222 -->
+    - [x] Refactor `RoadmapEditor` (Jedi Theme) <!-- id: 223 -->
+    - [x] Refactor `SkillMatrix` Modal (Jedi Theme) <!-- id: 224 -->
+- [x] Enable Log Editing <!-- id: 230 -->
+    - [x] Update `LogModal` to support Edit Mode <!-- id: 231 -->
+    - [x] Create `LogHistoryModal` (List of recent logs + Edit/Delete) <!-- id: 232 -->
+    - [x] Add "View History" button to Activity Log section <!-- id: 233 -->
+- [x] Enable Skills & Placements Editing <!-- id: 240 -->
+    - [x] Update `SkillMatrix` (Edit Modal + Add Logic) <!-- id: 241 -->
+    - [x] Refactor `PlacementTracker` (Jedi Theme + Edit Logic) <!-- id: 242 -->
+- [x] Redesign Landing Page (Deep Mind Theme) <!-- id: 250 -->
+    - [x] Add 3D Hover Effects <!-- id: 251 -->
+    - [x] Implement Hero Animation <!-- id: 252 -->
+    - [x] Add Feature Grid with Icons <!-- id: 253 -->
+    - [x] Generalize Copy (Remove AI/ML specific) <!-- id: 254 -->
+- [x] Fix Type Errors & Add Goals Edit <!-- id: 260 -->
+    - [x] Update DB Schema (Skill, Roadmap) <!-- id: 261 -->
+    - [x] Fix SkillMatrix & RoadmapView crashes <!-- id: 262 -->
+    - [x] Implement Goal Editing (Inline) <!-- id: 263 -->
+- [x] Polish UI (Settings, Buttons, Deep Work) <!-- id: 270 -->
+    - [x] Refactor `RoadmapEditor` (Proprs & Theme) <!-- id: 271 -->
+    - [x] Refactor Dashboard Buttons (Log Mission) <!-- id: 272 -->
+    - [x] Refactor Deep Work Timer (Jedi Buttons) <!-- id: 273 -->
+    - [x] Refactor Settings Page (Jedi Cards) <!-- id: 274 -->
+- [x] Upgrade Activity Chart <!-- id: 280 -->
+    - [x] Refactor `useAnalytics` (Stack Data) <!-- id: 281 -->
+    - [x] Implement Stacked Bar Chart (Colors) <!-- id: 282 -->
+- [x] Redesign Insights & Logs <!-- id: 290 -->
+    - [x] Refactor `InsightsView` (Jedi Cards, Icons, Colors) <!-- id: 291 -->
+    - [x] Refactor `LogModal` (Light Theme, Neo-Brutalist) <!-- id: 292 -->
+- [x] Implement Goals Page & Sync <!-- id: 300 -->
+    - [x] Create `WeeklyGoalCard` component <!-- id: 301 -->
+    - [x] Create `app/goals/page.tsx` <!-- id: 302 -->
+    - [x] Update Sidebar (Add Goals, Remove Insights) <!-- id: 303 -->
+    - [x] Update Dashboard (Use `WeeklyGoalCard`) <!-- id: 304 -->
+    - [x] Refactor Goals Page to Column Layout <!-- id: 305 -->
+- [/] Implement Auth & Onboarding <!-- id: 310 -->
+    - [x] Create `AuthProvider` <!-- id: 311 -->
+    - [x] Create `app/onboarding/page.tsx` <!-- id: 312 -->
+    - [x] Add Pre-written Goal Suggestions <!-- id: 313 -->
+    - [x] Update `LandingPage` Logic <!-- id: 314 -->
+    - [x] Update `Shell` Protection <!-- id: 315 -->
+    - [x] Update Sidebar Logout <!-- id: 316 -->

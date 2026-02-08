@@ -1,0 +1,140 @@
+@import "tailwindcss";
+
+@theme {
+  /* Fonts */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+  --font-display: var(--font-space-mono), monospace;
+
+  /* Solid Bold Colors - High Saturation */
+  --color-cream: #FFFFFF;
+  /* Stark White base */
+  --color-mint: #00FF94;
+  /* Vivid Mint/Green */
+  --color-sage: #00C2FF;
+  /* Replaced with Vivid Cyan/Blue */
+  --color-mustard: #FFD600;
+  /* Vivid Yellow */
+  --color-soft-pink: #FF00FF;
+  /* Magenta/Hot Pink aka "Neo-Pink" */
+  --color-lavender: #9D00FF;
+  /* Vivid Purple */
+  --color-orange: #FF5C00;
+  /* Vivid Orange */
+
+  --color-ink: #000000;
+
+  --color-bg-primary: var(--color-cream);
+  --color-bg-secondary: #FFFFFF;
+  --color-bg-tertiary: var(--color-mint);
+
+  --color-text-primary: var(--color-ink);
+  --color-text-secondary: #000000;
+  /* All text bold black */
+  --color-text-muted: #666666;
+
+  --color-border: #000000;
+
+  --color-primary: var(--color-sage);
+  --color-secondary: var(--color-mustard);
+}
+
+@layer base {
+  body {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+  }
+
+  /* Deep Work Mode */
+  .deep-work-mode {
+    --color-bg-primary: #000000;
+    --color-bg-secondary: #111111;
+    --color-text-primary: #FFFFFF;
+    --color-text-secondary: #CCCCCC;
+    --color-border: #FFFFFF;
+  }
+}
+
+@layer components {
+
+  /* The Core Neo-Brutalist Card - Shared Styles */
+  .neo-card,
+  .neo-card-yellow,
+  .neo-card-pink,
+  .neo-card-mint,
+  .card {
+    background-color: var(--color-bg-secondary);
+    border: 3px solid var(--color-border);
+    /* Thicker border */
+    box-shadow: 6px 6px 0px 0px var(--color-border);
+    /* Deeper shadow */
+    border-radius: 0px;
+    /* Sharp corners for extra boldness if desired, but waiting for user preference. Keeping rounded for now but tight. */
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: all 0.1s ease-in-out;
+  }
+
+  .neo-card:hover,
+  .neo-card-yellow:hover,
+  .neo-card-pink:hover,
+  .neo-card-mint:hover,
+  .card:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 10px 10px 0px 0px var(--color-border);
+  }
+
+  /* Variant Overrides */
+  .neo-card-yellow {
+    background-color: var(--color-mustard);
+  }
+
+  .neo-card-pink {
+    background-color: var(--color-soft-pink);
+  }
+
+  .neo-card-mint {
+    background-color: var(--color-mint);
+  }
+
+  /* Button Styles */
+  .neo-btn,
+  .neo-btn-primary {
+    border: 3px solid black;
+    background-color: white;
+    padding: 0.75rem 1.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    transition: all 0.1s;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .neo-btn:hover,
+  .neo-btn-primary:hover {
+    transform: translateY(-4px);
+    box-shadow: 6px 6px 0px 0px rgba(0, 0, 0, 1);
+    background-color: var(--color-mustard);
+  }
+
+  .neo-btn:active,
+  .neo-btn-primary:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+
+  .neo-btn-primary {
+    background-color: var(--color-sage);
+    /* Bright Blue */
+    color: white;
+  }
+
+  .neo-btn-primary:hover {
+    background-color: var(--color-lavender);
+    /* Purple on hover */
+    color: white;
+  }
+}
