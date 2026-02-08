@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 import { useAuth } from "@/components/providers/auth-provider"
 import { db } from "@/lib/db"
 import { useRouter } from "next/navigation"
+import { supabase } from "@/lib/supabase"
 
 export default function LandingPage() {
     const { scrollYProgress } = useScroll()
@@ -15,12 +16,13 @@ export default function LandingPage() {
     const y = useTransform(scrollYProgress, [0, 1], [0, -50])
 
     const handleStart = async () => {
-        // Check if user has a profile
-        const settings = await db.settings.orderBy('id').first()
-        if (settings && settings.username) {
-            login() // Already has profile, just login
+        // Check if user is authenticated via Supabase
+        const { data: { session } } = await supabase.auth.getSession()
+
+        if (session) {
+            router.push("/dashboard")
         } else {
-            router.push("/onboarding") // Needs profile
+            router.push("/auth") // Redirect to new Auth page
         }
     }
 

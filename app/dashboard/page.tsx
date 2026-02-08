@@ -1,6 +1,9 @@
 "use client"
 
 import * as React from "react"
+import { motion } from "framer-motion"
+import { useAuth } from "@/components/providers/auth-provider"
+import { useEffect } from "react"
 import { Shell } from "@/components/layout/shell"
 import { Header } from "@/components/dashboard/header"
 import { useExecutionScore } from "@/hooks/use-execution-score"
@@ -15,7 +18,16 @@ import { WeeklyGoalCard } from "@/components/features/goals/weekly-goal-card"
 import { useLiveQuery } from "dexie-react-hooks"
 import { db } from "@/lib/db"
 
-export default function Home() {
+import { syncData } from "@/lib/sync"
+
+export default function DashboardPage() {
+  const { user, isAuthenticated } = useAuth()
+
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      syncData() // Background sync on load
+    }
+  }, [isAuthenticated])
   const { score, details } = useExecutionScore()
   const { hoursData, focusData } = useAnalytics()
   const projects = useLiveQuery(() => db.projects.toArray())

@@ -2,10 +2,13 @@
 
 import * as React from "react"
 import { useRouter, usePathname } from "next/navigation"
+import { supabase } from "@/lib/supabase"
+import { User } from "@supabase/supabase-js"
 
 interface AuthContextType {
     isAuthenticated: boolean
-    login: () => void
+    user: User | null
+    login: () => void // For now, we'll keep this but it might need to trigger a UI
     logout: () => void
     isOnboarding: boolean
     checkAuth: () => void
@@ -14,39 +17,52 @@ interface AuthContextType {
 const AuthContext = React.createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [isAuthenticated, setIsAuthenticated] = React.useState(false)
-    const [isOnboarding, setIsOnboarding] = React.useState(true) // Default to guarding
+    const [user, setUser] = React.useState<User | null>(null)
+    const [isOnboarding, setIsOnboarding] = React.useState(true)
     const router = useRouter()
     const pathname = usePathname()
 
-    const checkAuth = React.useCallback(() => {
-        const auth = localStorage.getItem("mc_auth")
-        if (auth === "true") {
-            setIsAuthenticated(true)
-        } else {
-            setIsAuthenticated(false)
-        }
-        setIsOnboarding(false)
-    }, [])
-
     React.useEffect(() => {
-        checkAuth()
-    }, [checkAuth])
+        // Check active session
+        const checkSession = async () => {
+            const { data: { session } } = await supabase.auth.getSession()
+            setUser(session?.user ?? null)
+            setIsOnboarding(false)
+        }
 
-    const login = () => {
-        localStorage.setItem("mc_auth", "true")
-        setIsAuthenticated(true)
-        router.push("/dashboard")
+        checkSession()
+
+        // Listen for changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null)
+            if (!session && pathname !== "/" && !pathname.includes("/auth")) {
+                router.push("/")
+            }
+        })
+
+        return () => subscription.unsubscribe()
+    }, [router, pathname])
+
+    const login = async () => {
+        // Temporary: Aggregate login wrapper
+        // In reality, this should be called by a Login component
+        console.log("Login triggered - implement actual UI for email/password or OAuth")
     }
 
-    const logout = () => {
-        localStorage.removeItem("mc_auth")
-        setIsAuthenticated(false)
+    const logout = async () => {
+        await supabase.auth.signOut()
         router.push("/")
     }
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, login, logout, isOnboarding, checkAuth }}>
+        <AuthContext.Provider value={{
+            isAuthenticated: !!user,
+            user,
+            login,
+            logout,
+            isOnboarding,
+            checkAuth: () => { } // No-op now as it's reactive
+        }}>
             {children}
         </AuthContext.Provider>
     )
