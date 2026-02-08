@@ -11,7 +11,7 @@ import {
     Shield
 } from "lucide-react"
 
-const SIDEBAR_ITEMS = [
+export const SIDEBAR_ITEMS = [
     { label: 'Roadmap', href: '/roadmap', icon: Map },
     { label: 'Career', href: '/career-connect', icon: Briefcase },
     { label: 'Skills', href: '/skills', icon: Zap },
