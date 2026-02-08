@@ -45,6 +45,23 @@ function ErrorContent() {
                         setStatus('success')
                         // Clear hash to clean URL
                         window.history.replaceState(null, '', window.location.pathname)
+
+                        // Check Onboarding Status
+                        const { data: { user } } = await supabase.auth.getUser()
+                        if (user) {
+                            const { data: profile } = await supabase
+                                .from('profiles')
+                                .select('role, level')
+                                .eq('id', user.id)
+                                .single()
+
+                            if (!profile?.role || !profile?.level) {
+                                console.log("Profile incomplete, redirecting to Onboarding")
+                                setTimeout(() => router.push('/onboarding'), 1500)
+                                return
+                            }
+                        }
+
                         setTimeout(() => router.push('/dashboard'), 1500)
                     } else {
                         console.error("Restoration failed", error)
