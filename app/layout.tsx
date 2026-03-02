@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Inter, JetBrains_Mono, Space_Mono } from "next/font/google";
 import { DeepWorkProvider } from "@/components/providers/deep-work-provider";
 // import { SidebarProvider } from "@/components/providers/sidebar-provider";
@@ -39,6 +40,7 @@ export default function RootLayout({
         <AuthProvider>
           <DeepWorkProvider>
             {children}
+            <Analytics />
           </DeepWorkProvider>
         </AuthProvider>
       </body>
