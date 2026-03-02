@@ -8,19 +8,24 @@ import {
     Briefcase,
     Zap,
     GraduationCap,
-    Shield
+    Wand2,
+    Shield,
+    LogOut
 } from "lucide-react"
+import { useAuth } from "@/components/providers/auth-provider"
 
 export const SIDEBAR_ITEMS = [
-    { label: 'Roadmap', href: '/roadmap', icon: Map },
-    { label: 'Career', href: '/career-connect', icon: Briefcase },
-    { label: 'Skills', href: '/skills', icon: Zap },
-    { label: 'Placement', href: '/placements', icon: GraduationCap },
-    { label: 'Admin', href: '/admin', icon: Shield },
+    { label: 'Dashboard', href: '/dashboard', icon: Zap },
+    { label: 'Sprint', href: '/sprint', icon: Map },
+    { label: 'AI Plan', href: '/plan', icon: Wand2 },
+    { label: 'Projects', href: '/projects', icon: Briefcase },
+    { label: 'Skills', href: '/skills', icon: GraduationCap },
+    { label: 'Admin', href: '/admin', icon: Shield }
 ]
 
 export function Sidebar() {
     const pathname = usePathname()
+    const { logout } = useAuth()
 
     return (
         <aside className="fixed left-0 top-[76px] bottom-0 w-64 bg-[#FBF9F1] border-r-4 border-black p-4 hidden lg:flex flex-col gap-2 z-40">
@@ -49,6 +54,16 @@ export function Sidebar() {
                     </Link>
                 )
             })}
+
+            <div className="mt-auto pt-4 border-t-4 border-black border-dashed">
+                <button
+                    onClick={logout}
+                    className="w-full flex items-center gap-3 px-4 py-3 font-bold font-mono uppercase text-sm transition-all border-2 border-transparent text-red-500 hover:bg-red-500 hover:text-white hover:border-black active:translate-y-[2px]"
+                >
+                    <LogOut size={18} strokeWidth={2} />
+                    Logout
+                </button>
+            </div>
         </aside>
     )
 }

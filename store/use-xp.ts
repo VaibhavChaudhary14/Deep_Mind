@@ -24,48 +24,51 @@ export const useXP = create<XPState>((set, get) => ({
     nextLevelXp: 100,
 
     fetchXP: async () => {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return
+        try {
+            const { data: { user }, error: authError } = await supabase.auth.getUser()
+            if (!user || authError) return
 
-        const { data, error } = await supabase
-            .from('profiles')
-            .select('xp')
-            .eq('id', user.id)
-            .single()
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('xp')
+                .eq('id', user.id)
+                .single()
 
-        if (data) {
-            const { level, title, progress, nextLevelXp } = getLevelFn(data.xp || 0)
-            set({ xp: data.xp || 0, level, title, progress, nextLevelXp })
+            if (data) {
+                const { level, title, progress, nextLevelXp } = getLevelFn(data.xp || 0)
+                set({ xp: data.xp || 0, level, title, progress, nextLevelXp })
+            }
+        } catch (err) {
+            console.warn("XP Sync bypassed due to network timeout.")
         }
     },
 
     addXP: async (amount, reason) => {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return
-
         const currentXp = get().xp
         const newXp = currentXp + amount
 
-        // Optimistic Update
+        // Optimistic Update immediately
         const { level, title, progress, nextLevelXp } = getLevelFn(newXp)
         set({ xp: newXp, level, title, progress, nextLevelXp })
 
-        // DB Update
-        const { error } = await supabase
-            .from('profiles')
-            .update({ xp: newXp, updated_at: new Date().toISOString() })
-            .eq('id', user.id)
-
-        if (error) {
-            console.error("Failed to sync XP:", error)
-            // Revert? For now, just log.
-        }
-
-        // Check for Level Up
         const oldLevel = getLevelFn(currentXp).level
         if (level > oldLevel) {
-            // Trigger Level Up Toast/Modal (Future)
             console.log(`Level Up! ${oldLevel} -> ${level}`)
+        }
+
+        // DB Update wrapped in try/catch to prevent Turbopack/JSON crashes on timeout
+        try {
+            const { data: { user }, error: authError } = await supabase.auth.getUser()
+            if (!user || authError) return
+
+            const { error } = await supabase
+                .from('profiles')
+                .update({ xp: newXp, updated_at: new Date().toISOString() })
+                .eq('id', user.id)
+
+            if (error) console.warn("Background XP sync failed:", error.message)
+        } catch (err) {
+            console.warn("Background XP sync network timeout bypassed.")
         }
     }
 }))

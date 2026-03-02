@@ -22,8 +22,8 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Deep Mind - Professional OS",
-  description: "Advanced tracking for High-Performance Operators",
+  title: "Deep Mind - The 90-Day Career Sprint Protocol",
+  description: "A structured career acceleration system for early-career engineers. Force momentum with timebound execution cycles.",
 };
 
 export default function RootLayout({

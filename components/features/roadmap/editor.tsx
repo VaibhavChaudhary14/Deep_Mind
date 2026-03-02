@@ -4,6 +4,7 @@ import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { X, Plus, Trash2, Save, Calendar } from "lucide-react"
 import { db, Roadmap } from "@/lib/db"
+import { useLiveQuery } from "dexie-react-hooks"
 
 interface RoadmapEditorProps {
     isOpen: boolean
@@ -12,6 +13,7 @@ interface RoadmapEditorProps {
 }
 
 export function RoadmapEditor({ isOpen, onClose, weekToEdit }: RoadmapEditorProps) {
+    const activeSprint = useLiveQuery(() => db.sprints.where('status').equals('active').first());
     const [formData, setFormData] = React.useState({
         week: 1,
         topic: '',
@@ -49,7 +51,8 @@ export function RoadmapEditor({ isOpen, onClose, weekToEdit }: RoadmapEditorProp
             topic: formData.topic,
             status: formData.status as any,
             goals: formData.goals.split('\n').map(s => s.trim()).filter(Boolean),
-            project: formData.project
+            project: formData.project,
+            sprint_id: activeSprint?.id
         }
 
         if (weekToEdit?.id) {

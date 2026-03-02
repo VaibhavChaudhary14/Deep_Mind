@@ -30,12 +30,19 @@ export async function syncData() {
     // 2. Sync Logs
     const localLogs = await db.logs.toArray()
     if (localLogs.length > 0) {
+        // Deduplicate logs by date/focus_area to prevent upsert errors if Dexie has dupes
+        const uniqueLogsMap = new Map();
+        localLogs.forEach(log => {
+            uniqueLogsMap.set(`${log.date}-${log.focus_area}`, log);
+        });
+        const uniqueLogs = Array.from(uniqueLogsMap.values());
+
         const { error } = await supabase
             .from('logs')
-            .upsert(localLogs.map(log => ({
+            .upsert(uniqueLogs.map(log => ({
                 ...log,
                 user_id: user.id
-            })), { onConflict: 'id, date' })
+            })), { onConflict: 'id' })
 
         if (error) console.error("Logs sync error:", error)
     }
@@ -69,7 +76,9 @@ export async function syncData() {
                 }
 
                 if (remoteId) {
-                    updates.push({ ...payload, id: remoteId })
+                    if (!updates.find(u => u.id === remoteId)) {
+                        updates.push({ ...payload, id: remoteId })
+                    }
                 } else {
                     inserts.push(payload)
                 }

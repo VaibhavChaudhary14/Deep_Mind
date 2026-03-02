@@ -1,47 +1,136 @@
-import { Check, Github } from "lucide-react"
-import Link from "next/link"
+"use client";
+
+import { Shell } from "@/components/layout/shell";
+import { Header } from "@/components/dashboard/header";
+import { Check, Rocket, Shield, Zap } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/providers/auth-provider";
+import { useState } from "react";
 
 export default function PricingPage() {
+    const router = useRouter();
+    const { user } = useAuth();
+    const [isLoading, setIsLoading] = useState<string | null>(null);
+
+    const handleCheckout = async (tier: string, priceId: string) => {
+        if (!user) {
+            router.push('/auth');
+            return;
+        }
+
+        setIsLoading(tier);
+        try {
+            const res = await fetch('/api/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: user.id, email: user.email, tier, priceId })
+            });
+            const data = await res.json();
+            if (data.url) {
+                window.location.href = data.url;
+            }
+        } catch (error) {
+            console.error('Checkout error:', error);
+        } finally {
+            setIsLoading(null);
+        }
+    };
+
     return (
-        <div className="min-h-screen bg-[var(--color-bg-primary)] text-white">
-            <nav className="p-6 flex justify-between items-center max-w-7xl mx-auto">
-                <Link href="/" className="text-xl font-bold tracking-tight text-[var(--color-ml)]">MissionControl</Link>
-                <Link href="/dashboard" className="text-sm font-medium hover:text-[var(--color-primary)]">Go to Dashboard</Link>
-            </nav>
+        <Shell>
+            <Header />
 
-            <div className="py-20 px-4 text-center">
-                <div className="inline-block px-4 py-1.5 rounded-full bg-green-900/30 border border-green-800 text-green-400 text-sm font-bold mb-6 animate-pulse">
-                    100% Free & Open Source
+            <div className="max-w-6xl mx-auto py-12 px-4">
+                <div className="text-center mb-16">
+                    <h1 className="text-5xl md:text-6xl font-black font-mono uppercase tracking-tighter mb-4">
+                        Fund Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00C2FF] to-[#9D00FF] [-webkit-text-stroke:2px_black]">Velocity</span>
+                    </h1>
+                    <p className="text-lg font-mono font-bold text-gray-500 max-w-2xl mx-auto">
+                        Deep Mind is not a free to-do list. It is an acceleration engine for engineers serious about their compounding value.
+                    </p>
                 </div>
-                <h1 className="text-4xl md:text-5xl font-bold mb-6">Invest in Yourself, Not Tools.</h1>
-                <p className="text-[var(--color-text-secondary)] mb-12 max-w-2xl mx-auto text-lg">
-                    We believe career growth should be accessible to everyone. Mission Control is completely free for all engineers.
-                </p>
 
-                <div className="max-w-md mx-auto p-8 rounded-3xl border border-[var(--color-primary)] bg-gradient-to-b from-blue-900/10 to-transparent relative overflow-hidden">
-                    <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-50"></div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+                    {/* Trial */}
+                    <div className="neo-card bg-white border-4 border-black relative">
+                        <div className="absolute top-0 right-0 bg-gray-200 border-l-4 border-b-4 border-black px-3 py-1 font-black font-mono text-sm">
+                            7 DAYS
+                        </div>
+                        <h2 className="text-2xl font-black font-mono uppercase mb-2">Initiate</h2>
+                        <div className="text-5xl font-black tracking-tighter mb-6">$2</div>
+                        <p className="font-bold text-sm text-gray-600 mb-8 border-l-4 border-black pl-3 min-h-[60px]">
+                            Commit a micro-fee to filter out the unserious. Full system access for 7 days.
+                        </p>
 
-                    <h3 className="text-3xl font-bold mb-2">Community Edition</h3>
-                    <div className="text-5xl font-bold mb-2">$0</div>
-                    <p className="text-sm text-gray-400 mb-8">Forever.</p>
+                        <ul className="space-y-4 mb-8">
+                            <li className="flex gap-3 items-start"><Check className="text-[#00FF94] mt-1" size={18} /> <span className="font-bold text-sm">One Active 90-Day Sprint</span></li>
+                            <li className="flex gap-3 items-start"><Check className="text-[#00FF94] mt-1" size={18} /> <span className="font-bold text-sm">Daily Execution Board</span></li>
+                            <li className="flex gap-3 items-start"><Check className="text-[#00FF94] mt-1" size={18} /> <span className="font-bold text-sm">Actionable UI Widgets</span></li>
+                        </ul>
 
-                    <ul className="space-y-4 mb-8 text-left">
-                        <li className="flex gap-3 items-center"><Check size={20} className="text-green-500" /> Unlimited Logs & Analytics</li>
-                        <li className="flex gap-3 items-center"><Check size={20} className="text-green-500" /> AI Career Coach Insights</li>
-                        <li className="flex gap-3 items-center"><Check size={20} className="text-green-500" /> Full Roadmap & Task Board</li>
-                        <li className="flex gap-3 items-center"><Check size={20} className="text-green-500" /> Local-First Privacy (Your Data is Yours)</li>
-                        <li className="flex gap-3 items-center"><Check size={20} className="text-green-500" /> Export to JSON/CSV</li>
-                    </ul>
+                        <button
+                            onClick={() => handleCheckout('initiate', 'price_initiate_stripe_id')}
+                            disabled={!!isLoading}
+                            className="w-full py-4 bg-white text-black border-2 border-black font-black uppercase shadow-[4px_4px_0_#000] hover:bg-gray-100 transition-all active:translate-y-1 active:shadow-none disabled:opacity-50"
+                        >
+                            {isLoading === 'initiate' ? 'Loading...' : 'Start Trial'}
+                        </button>
+                    </div>
 
-                    <Link href="/dashboard" className="block w-full py-4 text-center rounded-xl bg-[var(--color-primary)] hover:bg-blue-600 font-bold transition-all shadow-lg shadow-blue-500/25 mb-4">
-                        Launch Dashboard
-                    </Link>
+                    {/* Pro */}
+                    <div className="neo-card bg-black text-white border-4 border-black shadow-[12px_12px_0_#00FF94] transform md:-translate-y-8 relative">
+                        <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-[#00FF94] text-black border-2 border-black px-4 py-1 font-black font-mono tracking-widest shadow-[4px_4px_0_#000]">
+                            MOST CHOSEN
+                        </div>
+                        <h2 className="text-2xl font-black font-mono uppercase text-[#00FF94] mb-2 mt-4">Operator</h2>
+                        <div className="text-5xl font-black tracking-tighter mb-6 text-white">$15<span className="text-xl text-gray-500">/mo</span></div>
+                        <p className="font-bold text-sm text-gray-400 mb-8 border-l-4 border-[#00FF94] pl-3 min-h-[60px]">
+                            Monthly subscription to the exact framework used by elite engineers.
+                        </p>
 
-                    <a href="https://github.com/VaibhavChaudhary14" target="_blank" className="flex items-center justify-center gap-2 w-full py-3 text-center rounded-xl bg-gray-800 hover:bg-gray-700 font-bold transition-colors text-sm">
-                        <Github size={18} /> Star on GitHub
-                    </a>
+                        <ul className="space-y-4 mb-8">
+                            <li className="flex gap-3 items-start"><Zap className="text-[#00FF94] mt-1" size={18} /> <span className="font-bold text-sm">Unlimited 90-Day Sprints</span></li>
+                            <li className="flex gap-3 items-start"><Zap className="text-[#00FF94] mt-1" size={18} /> <span className="font-bold text-sm">Strategic AI Coach Unblockers</span></li>
+                            <li className="flex gap-3 items-start"><Zap className="text-[#00FF94] mt-1" size={18} /> <span className="font-bold text-sm">Weekly Acceleration Reports</span></li>
+                            <li className="flex gap-3 items-start"><Zap className="text-[#00FF94] mt-1" size={18} /> <span className="font-bold text-sm">Momentum Risk Detection</span></li>
+                        </ul>
+
+                        <button
+                            onClick={() => handleCheckout('operator', 'price_operator_stripe_id')}
+                            disabled={!!isLoading}
+                            className="w-full py-4 bg-[#00FF94] text-black border-2 border-[#00FF94] font-black uppercase shadow-[4px_4px_0_#fff] hover:bg-[#00c572] hover:border-[#00c572] transition-all active:translate-y-1 active:shadow-none disabled:opacity-50"
+                        >
+                            {isLoading === 'operator' ? 'Loading...' : 'Subscribe Monthly'}
+                        </button>
+                    </div>
+
+                    {/* Annual */}
+                    <div className="neo-card bg-white border-4 border-black relative">
+                        <div className="absolute top-0 right-0 bg-[#FFD600] border-l-4 border-b-4 border-black px-3 py-1 font-black font-mono text-sm">
+                            SAVE 33%
+                        </div>
+                        <h2 className="text-2xl font-black font-mono uppercase mb-2">Architect</h2>
+                        <div className="text-5xl font-black tracking-tighter mb-6">$120<span className="text-xl text-gray-500">/yr</span></div>
+                        <p className="font-bold text-sm text-gray-600 mb-8 border-l-4 border-black pl-3 min-h-[60px]">
+                            The long-term play. Lock your trajectory in for a full year of compounded growth.
+                        </p>
+
+                        <ul className="space-y-4 mb-8">
+                            <li className="flex gap-3 items-start"><Shield className="text-[#FF00FF] mt-1" size={18} /> <span className="font-bold text-sm">Everything in Operator</span></li>
+                            <li className="flex gap-3 items-start"><Shield className="text-[#FF00FF] mt-1" size={18} /> <span className="font-bold text-sm">V1 Dormant Feature Early Access</span></li>
+                            <li className="flex gap-3 items-start"><Shield className="text-[#FF00FF] mt-1" size={18} /> <span className="font-bold text-sm">Direct priority support</span></li>
+                        </ul>
+
+                        <button
+                            onClick={() => handleCheckout('architect', 'price_architect_stripe_id')}
+                            disabled={!!isLoading}
+                            className="w-full py-4 bg-black text-white border-2 border-black font-black uppercase shadow-[4px_4px_0_#FFD600] hover:bg-gray-800 transition-all active:translate-y-1 active:shadow-none mt-auto disabled:opacity-50"
+                        >
+                            {isLoading === 'architect' ? 'Loading...' : 'Subscribe Annually'}
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-    )
+        </Shell>
+    );
 }

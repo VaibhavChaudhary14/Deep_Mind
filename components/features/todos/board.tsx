@@ -50,20 +50,41 @@ export function TodoBoard() {
         }
     }
 
+    const handleClearAll = async () => {
+        if (confirm('WARNING: Are you sure you want to delete EVERY task on this board? This action cannot be undone.')) {
+            await db.todos.clear()
+        }
+    }
+
     if (!todos) return <div className="font-mono text-xl font-bold">Loading board...</div>
 
     return (
-        <div className="h-[calc(100vh-140px)] flex gap-8 overflow-x-auto pb-4">
-            {COLUMNS.map(col => (
-                <Column
-                    key={col.id}
-                    column={col}
-                    todos={todos.filter(t => t.status === col.id)}
-                    onAdd={(title: string) => handleAdd(col.id, title)}
-                    onUpdateStatus={handleUpdateStatus}
-                    onDelete={handleDelete}
-                />
-            ))}
+        <div className="flex flex-col h-full gap-4">
+            <div className="flex justify-between items-center px-1">
+                <div className="font-mono text-sm font-bold text-gray-500 uppercase">
+                    Active Objects: {todos.length}
+                </div>
+                <button
+                    onClick={handleClearAll}
+                    disabled={todos.length === 0}
+                    className="flex items-center gap-2 px-4 py-2 bg-white text-red-500 font-bold font-mono text-sm uppercase border-2 border-red-500 shadow-[4px_4px_0_#ef4444] hover:bg-red-500 hover:text-white hover:border-black transition-all active:translate-y-[2px] active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <Trash2 size={16} strokeWidth={2.5} /> Nuke Board
+                </button>
+            </div>
+
+            <div className="h-[calc(100vh-190px)] min-h-[500px] flex gap-8 overflow-x-auto pb-4">
+                {COLUMNS.map(col => (
+                    <Column
+                        key={col.id}
+                        column={col}
+                        todos={todos.filter(t => t.status === col.id)}
+                        onAdd={(title: string) => handleAdd(col.id, title)}
+                        onUpdateStatus={handleUpdateStatus}
+                        onDelete={handleDelete}
+                    />
+                ))}
+            </div>
         </div>
     )
 }
